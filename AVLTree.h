@@ -9,21 +9,24 @@ private:
 	struct Node
 	{
 		int data;
-		int height;
+		int height; //by default node is leaf => h=0
 		Node* left, * right;
 		Node(int data, int height = 0, Node* left = nullptr, Node* right = nullptr)
 			: data(data), height(height), left(left), right(right){}
 	};
-
+	
 	Node* root;
+
 private:
+	//--help functions for the constructors--//
 	Node* copy(Node* other_root)
 	{
 		if (other_root == nullptr)
-			return;
+			return nullptr;
 		Node* new_node = new Node(other_root->data);
 		new_node->left = copy(other_root->left);
 		new_node->right = copy(other_root->right);
+		return root;
 	}
 	void del(Node* &root)
 	{
@@ -34,7 +37,26 @@ private:
 		delete root;
 	}
 
-	Node* getMinNode(Node* root)
+	//--private setters and getters--//
+	int getBalance(Node* node) const
+	{
+		if (node == nullptr)
+			return 0;
+		return getHeight(node->left) - getHeight(node->right);
+	}
+	int getHeight(Node* node) const
+	{
+		if (node == nullptr)
+			return -1; //no node
+		return node->height;
+	}
+	void setHeight(Node* node)
+	{
+		node->height = 1 + std::max
+		(getHeight(node->left),
+			getHeight(node->right));
+	}
+	Node* getMinNode(Node* root) const
 	{
 		Node* curr = root;
 		while (curr->left != nullptr && curr != nullptr)
@@ -42,8 +64,8 @@ private:
 			curr = curr->left;
 		}
 		return curr;
-	}
-	Node* getMaxNode(Node* root)
+	} 
+	Node* getMaxNode(Node* root) const
 	{
 		Node* curr = root;
 		while (curr->right != nullptr && curr != nullptr)
@@ -52,49 +74,19 @@ private:
 		}
 		return curr;
 	}
-	
-
-	int getBalance(Node* node)
+	size_t sizeHelp(Node* root) const
 	{
-		if (node == nullptr)
+		if (root == nullptr)
 			return 0;
-		return getHeight(node->left) - getHeight(node->right);
-	}
-	int getHeight(Node* node)
-	{
-		if (node == nullptr)
-			return -1; //no node
-		return node->height;
+		return 1 + sizeHelp(root->left) + sizeHelp(root->right);
 	}
 
-
-	Node* searchHelp(Node* root, int value) //&? //returns ptr to element
+	//--self-balance function (possible improvements)--//
+	void selfBalance(Node*& root)
 	{
-		if (root == nullptr)
-			return nullptr;
-		if (value == root->data) //can be merged with the upper one
-			return root;
-		if (value < root->data)
-			return searchHelp(root->left, value);
-		if (value > root->data)
-			return searchHelp(root->right, value);
-	}
-	Node* insertHelp(Node* root, int value) //or bool
-	{
-		if (root == nullptr)
-		{
-			return new Node(value); 
-		}
-		if (value < root->data)
-			root->left = insertHelp(root->left, value);
-		if (value > root->data)
-			root->right = insertHelp(root->right, value);
-
-		root->height = 1 + std::max
-							(getHeight(root->left), 
-							 getHeight(root->right));
+		setHeight(root); //update-ing height
 		int balance = getBalance(root);
-		
+
 		if (balance > 1)
 		{
 			if (getBalance(root->left) >= 0)
@@ -109,22 +101,83 @@ private:
 			else
 				root = rotateRightLeft(root);
 		}
+	}
 
+	//--help functions--//
+	Node* searchHelp(Node* root, int value) const //&? //returns ptr to element
+	{
+		if (root == nullptr)
+			return nullptr;
+		if (value == root->data) //can be merged with the upper one
+			return root;
+		if (value < root->data)
+			return searchHelp(root->left, value);
+		if (value > root->data)
+			return searchHelp(root->right, value);
+	}
+	Node* insertHelp(Node* root, int value) //or bool
+	{
+		//BST insertion:
+		if (root == nullptr)
+		{
+			return new Node(value); 
+		}
+		if (value < root->data)
+			root->left = insertHelp(root->left, value);
+		if (value > root->data)
+			root->right = insertHelp(root->right, value);
+
+		selfBalance(root);
+		return root;
+	}
+	Node* removeHelp(Node* root, int value)
+	{
+		if (root == nullptr)
+			return root;
+
+		//search
+		if (root->data > value)
+		{
+			root->left = removeHelp(root->left, value);
+		}
+		else if (root->data < value)
+		{
+			root->right = removeHelp(root->right, value);
+		}
+		else //found
+		{
+			//leaf or 1 child node
+			if (root->left == nullptr) //only right child (or leaf)
+			{
+				Node* temp = root->right; //(or nullptr)
+				delete root;
+				return temp;
+			}
+			else if (root->right == nullptr) //only left child
+			{
+				Node* temp = root->left;
+				delete root;
+				return temp;
+			}
+			//2 child nodes
+			Node* temp = getMinNode(root->right); //min el in the right subtree
+			root->data = temp->data;
+			root->right = removeHelp(root->right, temp->data); //find min el and del
+		}
+
+		//selfBalance(root);
 		return root;
 	}
 
+	//--rotation functions--//
 	Node* rotateRight(Node* node)
 	{
 		Node* left_temp = node->left;
 		node->left = left_temp->right;
 		left_temp->right = node;
 
-		node->height = 1 + std::max
-			(getHeight(node->left),
-			 getHeight(node->right));
-		left_temp->height = 1 + std::max
-			(getHeight(left_temp->left),
-			 getHeight(left_temp->right));
+		setHeight(node);
+		setHeight(left_temp);
 
 		return left_temp;
 	}
@@ -139,12 +192,8 @@ private:
 		node->right = right_temp->left;
 		right_temp->left = node;
 
-		node->height = 1 + std::max
-			(getHeight(node->left),
-			 getHeight(node->right));
-		right_temp->height = 1 + std::max
-			(getHeight(right_temp->left),
-			 getHeight(right_temp->right));
+		setHeight(node);
+		setHeight(right_temp);
 
 		return right_temp;
 	}
@@ -154,56 +203,8 @@ private:
 		return rotateLeft(node);
 	}
 
-
-	Node* removeHelp(Node* root, int value)
-	{
-		if (root == nullptr)
-			return root;
-		//case 1 -> leaf
-		if (root->data < value)
-		{
-			root->left = removeHelp(root->left, value);
-		}
-		else if (root->data > value)
-		{
-			root->right = removeHelp(root->right, value);
-		}
-		else //root->data == value
-		{
-			//leaf
-			/*if (root->left == nullptr && root->right == nullptr) //sluchai?
-			{
-				delete root;
-				return nullptr; //???
-			}*/
-			//1 child node
-			if (root->left == nullptr)
-			{
-				Node* temp = root->left;
-				delete root;
-				return temp;
-			}
-			else if (root->right == nullptr)
-			{
-				Node* temp = root->right;
-				delete root;
-				return temp;
-			}
-			//2 child nodes
-			Node* temp = getMinNode(root->right); //min el in the right subtree
-			root->data = temp->data;
-			root->right = removeHelp(root->right, temp->data); //find min el and del
-		}
-		return root;
-	}
-	size_t sizeHelp(Node* root)
-	{
-		if (root == nullptr)
-			return 0;
-		return 1 + sizeHelp(root->left) + sizeHelp(root->right);
-	}
 public:
-	//BST
+	//--Constructors--//
 	AVLTree() :root(nullptr) {}
 	AVLTree(const AVLTree& other)
 	{
@@ -223,25 +224,28 @@ public:
 		del(root);
 	}
 
-	bool isElement(int value)
+	//--informative methods--//
+	bool isElement(int value) const
 	{
 		return searchHelp(root, value) != nullptr;
 	}
-	Node* search(int value)
+	size_t size() const
+	{
+		return sizeHelp(root);
+	}
+
+	//--search, insertion, deletion--//
+	Node* search(int value) const
 	{
 		return searchHelp(root, value);
 	}
 	void insert(int value)
 	{
-		insertHelp(root, value);
+		root = insertHelp(root, value);
 	}
 	void remove(int value)
 	{
 		removeHelp(root, value);
-	}
-	size_t size()
-	{
-		return sizeHelp(root);
 	}
 };
 
