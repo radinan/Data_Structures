@@ -1,6 +1,7 @@
 #pragma once
-
-//първо го правя BST после го upgrade-вам :)
+#include <iostream>
+#include <algorithm>
+//first - BST ; then - AVL 
 
 class AVLTree
 {
@@ -8,13 +9,10 @@ private:
 	struct Node
 	{
 		int data;
-		//int BF;
-		//int height;
+		int height;
 		Node* left, * right;
-		//Node(int data, int BF = 0, int height = -1, Node* left = nullptr, Node* right = nullptr)
-		//	:data(data), BF(BF), height(height), left(left), right(right){}
-		Node(int data, Node* left = nullptr, Node* right = nullptr)
-			: data(data), left(left), right(right){}
+		Node(int data, int height = 0, Node* left = nullptr, Node* right = nullptr)
+			: data(data), height(height), left(left), right(right){}
 	};
 
 	Node* root;
@@ -54,30 +52,109 @@ private:
 		}
 		return curr;
 	}
+	
 
-	Node* searchHelp(Node* root, int value) //&? //връща указател към елемента
+	int getBalance(Node* node)
+	{
+		if (node == nullptr)
+			return 0;
+		return getHeight(node->left) - getHeight(node->right);
+	}
+	int getHeight(Node* node)
+	{
+		if (node == nullptr)
+			return -1; //no node
+		return node->height;
+	}
+
+
+	Node* searchHelp(Node* root, int value) //&? //returns ptr to element
 	{
 		if (root == nullptr)
 			return nullptr;
-		if (value == root->data) //може да се обедини с горното
+		if (value == root->data) //can be merged with the upper one
 			return root;
 		if (value < root->data)
 			return searchHelp(root->left, value);
 		if (value > root->data)
 			return searchHelp(root->right, value);
 	}
-	void insertHelp(Node* root, int value) //може да е bool
+	Node* insertHelp(Node* root, int value) //or bool
 	{
 		if (root == nullptr)
 		{
-			new Node(value);
-			return;
+			return new Node(value); 
 		}
 		if (value < root->data)
-			insertHelp(root->left, value);
+			root->left = insertHelp(root->left, value);
 		if (value > root->data)
-			insertHelp(root->right, value);
+			root->right = insertHelp(root->right, value);
+
+		root->height = 1 + std::max
+							(getHeight(root->left), 
+							 getHeight(root->right));
+		int balance = getBalance(root);
+		
+		if (balance > 1)
+		{
+			if (getBalance(root->left) >= 0)
+				root = rotateRight(root);
+			else
+				root = rotateLeftRight(root);
+		}
+		else if (balance < -1)
+		{
+			if (getBalance(root->right) <= 0)
+				root = rotateLeft(root);
+			else
+				root = rotateRightLeft(root);
+		}
+
+		return root;
 	}
+
+	Node* rotateRight(Node* node)
+	{
+		Node* left_temp = node->left;
+		node->left = left_temp->right;
+		left_temp->right = node;
+
+		node->height = 1 + std::max
+			(getHeight(node->left),
+			 getHeight(node->right));
+		left_temp->height = 1 + std::max
+			(getHeight(left_temp->left),
+			 getHeight(left_temp->right));
+
+		return left_temp;
+	}
+	Node* rotateLeftRight(Node* node)
+	{
+		node->left = rotateLeft(node->left);
+		return rotateRight(node);
+	}
+	Node* rotateLeft(Node* node)
+	{
+		Node* right_temp = node->right;
+		node->right = right_temp->left;
+		right_temp->left = node;
+
+		node->height = 1 + std::max
+			(getHeight(node->left),
+			 getHeight(node->right));
+		right_temp->height = 1 + std::max
+			(getHeight(right_temp->left),
+			 getHeight(right_temp->right));
+
+		return right_temp;
+	}
+	Node* rotateRightLeft(Node* node)
+	{
+		node->right = rotateRight(node->right);
+		return rotateLeft(node);
+	}
+
+
 	Node* removeHelp(Node* root, int value)
 	{
 		if (root == nullptr)
@@ -113,9 +190,9 @@ private:
 				return temp;
 			}
 			//2 child nodes
-			Node* temp = getMinNode(root->right); //най-малкия ел в дясното поддърво
+			Node* temp = getMinNode(root->right); //min el in the right subtree
 			root->data = temp->data;
-			root->right = removeHelp(root->right, temp->data); //намираме мин елемента и го изтриваме
+			root->right = removeHelp(root->right, temp->data); //find min el and del
 		}
 		return root;
 	}
