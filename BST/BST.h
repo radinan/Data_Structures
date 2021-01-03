@@ -1,6 +1,13 @@
 #pragma once
 #include <iostream>
 
+//--Binary Search Tree--
+// Time complexity:
+// 	-> for all operations:  O(h),    h - height of tree
+// 	-> worst case: 		O(n),    h = number of nodes
+// 	-> best case: 		O(logn), h = logn
+
+
 template <class T>
 class BST
 {
@@ -9,12 +16,12 @@ private:
 	{
 		T data;
 		Node* left = nullptr, *right = nullptr;
-		size_t height = 0; //by default node is a leaf
-
+		
 		Node(T _data) : data(_data) {}
 	};
 	Node* root;
 private:
+	//constructor helpers
 	Node* copy(Node* other_root)
 	{
 		//empty tree
@@ -38,7 +45,8 @@ private:
 
 		delete root;	    //deleting every node
 	}
-
+	
+	//setters and getters
 	Node* get_min_node(Node* root)
 	{
 		// (left subtree) < root < (right subtree)
@@ -107,7 +115,6 @@ private:
 				root->data = min_right->data;							 //copy its data
 				root->right = remove_help(root->right, min_right->data); //find and remove the original
 			}
-
 		}
 
 		return root;
@@ -131,7 +138,7 @@ public:
 	{
 		if (this != other)
 		{
-			del();
+			del(root);
 			root = copy(other.root);
 		}
 		return *this;
@@ -146,7 +153,7 @@ public:
 	{
 		root = insert_help(root, element);
 	}
-	Node* search(T element) //possible overload for searching by "criterium"
+	Node* search(T element) //possible overload for searching by criterium
 	{
 		return search_help(root, element);
 	}
@@ -154,12 +161,10 @@ public:
 	{
 		root = remove_help(root, element);
 	}
-	//sort() {}  //overload for sort ;(
 
 	//print
 	void inorder()
 	{
 		inorder_help(root);
 	}
-
 };
