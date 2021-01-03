@@ -1,5 +1,5 @@
 #include <iostream>
-#include "AVLTree.h"
+#include "BST.h"
 
 int main()
 {
