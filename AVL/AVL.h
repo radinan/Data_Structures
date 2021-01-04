@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 
+
 //--AVL Tree-- 
 // self-balancing BST;  |B(n)| <= 1;
 // Time complexity:
@@ -15,14 +16,13 @@ private:
 	struct Node
 	{
 		T data;
-		Node* left = nullptr, *right = nullptr;
+		Node* left = nullptr, * right = nullptr;
 		size_t height = 0; //by default node is a leaf
 
 		Node(const T& _data) : data(_data) {}
 	};
 	Node* root;
 private:
-  //constructor helpers
 	Node* copy(Node* other_root)
 	{
 		//empty tree
@@ -62,13 +62,13 @@ private:
 	{
 		if (node == nullptr)
 			return -1; //no node
-		else 
+		else
 			return node->height;
 	}
 	void set_height(Node* node)
 	{
-		node->height = 1 + std::max(get_height(node->left), 
-									get_height(node->right));
+		node->height = 1 + std::max(get_height(node->left),
+			get_height(node->right));
 		//if node has no children -> h = 1 + (-1) = 0
 	}
 	int get_balance(Node* node) const
@@ -89,7 +89,7 @@ private:
 		node->right = temp->left;
 		temp->left = node;
 
-		//update heights
+		//set new heights
 		set_height(node);
 		set_height(temp);
 
@@ -101,7 +101,7 @@ private:
 		node->left = temp->right;
 		temp->right = node;
 
-		//update heights
+		//set new heights
 		set_height(node);
 		set_height(temp);
 
@@ -123,7 +123,7 @@ private:
 	{
 		//1. BST insert
 		//empty/end of tree
-		if (root == nullptr) 
+		if (root == nullptr)
 			return new Node(element);  //creating leaf
 		else if (element < root->data) //go in left subtree
 			root->left = insert_help(root->left, element);
@@ -157,7 +157,7 @@ private:
 
 		return root; //returning the root node at the end
 	}
-	Node* search_help(Node* root, T& element) const 
+	Node* search_help(Node* root, T& element) const //returns either the element, or nullptr
 	{
 		//BST search
 		//empty/end of tree or found 
@@ -189,7 +189,7 @@ private:
 			}
 			else if (root->right == nullptr) //analogical
 			{
-				Node* save = root->left; 
+				Node* save = root->left;
 				delete root;
 				return save;
 			}
@@ -234,6 +234,15 @@ private:
 
 		return root; //returning the root node at the end
 	}
+	void copy_insert_helper(Node* _root)
+	{
+		if (_root == nullptr)
+			return;
+
+		insert(_root->data);
+		copy_insert_helper(_root->left);
+		copy_insert_helper(_root->right);
+	}
 	void inorder_help(Node* root) const
 	{
 		if (root != nullptr)
@@ -252,7 +261,7 @@ private:
 			preorder_help(root->right);
 		}
 	}
-	size_t sizeHelp(Node* root) const
+	const size_t sizeHelp(Node* root) const
 	{
 		if (root == nullptr)
 			return 0;
@@ -260,7 +269,6 @@ private:
 	}
 
 public:
-  //constructors
 	AVL() : root(nullptr) {}
 	AVL(const AVL& other)
 	{
@@ -285,7 +293,7 @@ public:
 	{
 		root = insert_help(root, element);
 	}
-	Node* search(T& element) const //returns either the element, or nullptr
+	Node* search(T& element) const
 	{
 		return search_help(root, element);
 	}
@@ -294,7 +302,11 @@ public:
 		root = remove_help(root, element);
 	}
 
-	//other functions
+	//other
+	void copy_insert(AVL& other)
+	{
+		copy_insert_helper(other.root); //copying tree by insert()
+	}
 	void inorder() const
 	{
 		inorder_help(root);
@@ -303,7 +315,7 @@ public:
 	{
 		preorder_help(root);
 	}
-	size_t size() const
+	const size_t size() const
 	{
 		return sizeHelp(root);
 	}
