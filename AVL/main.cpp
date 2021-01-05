@@ -146,27 +146,26 @@ Property Song::property = Property::name; //by default
 
 int main()
 {
-	Song s("b", "c", 9), s1("b", "b", 5), s2("c", "a", 11);
-
-	//--year--
-	AVL<Song> year_sorted;
-	year_sorted.insert(s);
-	year_sorted.insert(s1);
-	year_sorted.insert(s2);
-	year_sorted.inorder();
+	Song s("How deep", "Anna Bana", 1998), s1("Po poleka", "Stefan Valdobrev", 2016), s2("Da", "Ina", 2011);
+	//--name--
+	AVL<Song> name_sorted;
+	name_sorted.insert(s);
+	name_sorted.insert(s1);
+	name_sorted.insert(s2);
+	name_sorted.inorder();
 	std::cout << std::endl;
 
-	//--name--
-	Song::property = Property::name;
+	//--year--
+	Song::property = Property::year;
 
-	AVL<Song> name_sorted(year_sorted);
-	name_sorted.inorder();
+	AVL<Song> year_sorted(name_sorted);
+	year_sorted.inorder();
 	std::cout << std::endl;
 
 	//--artist--
 	Song::property = Property::artist;
 
-	AVL<Song> artist_sorted(year_sorted);
+	AVL<Song> artist_sorted(name_sorted);
 	artist_sorted.inorder();
 	std::cout << std::endl;
 
