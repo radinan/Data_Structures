@@ -234,14 +234,16 @@ private:
 
 		return root; //returning the root node at the end
 	}
-	void copy_insert_helper(Node* _root)
+	Node* copy_insert_helper(Node* _root)
 	{
 		if (_root == nullptr)
-			return;
+			return nullptr;
 
 		insert(_root->data);
 		copy_insert_helper(_root->left);
 		copy_insert_helper(_root->right);
+
+		return root;
 	}
 	void inorder_help(Node* root) const
 	{
@@ -272,7 +274,8 @@ public:
 	AVL() : root(nullptr) {}
 	AVL(const AVL& other)
 	{
-		root = copy(other.root);
+		//root = copy(other.root);
+		root = copy_insert_helper(other.root);
 	}
 	AVL& operator=(const AVL& other)
 	{
@@ -303,10 +306,12 @@ public:
 	}
 
 	//other
-	void copy_insert(AVL& other)
+	/*void copy_insert()
 	{
+		AVL<T> other;
 		copy_insert_helper(other.root); //copying tree by insert()
-	}
+
+	}*/
 	void inorder() const
 	{
 		inorder_help(root);
