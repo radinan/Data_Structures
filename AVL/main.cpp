@@ -26,6 +26,12 @@ public:
 		}
 		return *this;
 	}
+	//new overload for comparing a class member with a number by year
+	bool operator>(int right)
+	{
+		if (Song::property == Property::year)
+			return year > right;
+	}
 
 	friend bool operator>(const Song& left, const Song& right) //without friend
 	{
@@ -120,7 +126,7 @@ public:
 			break;
 		}
 	}
-	friend bool operator==(const Song& left, const Song& right)
+	friend bool operator==(const Song& left, const Song& right) //not changed
 	{
 		switch (Song::property)
 		{
@@ -135,6 +141,21 @@ public:
 			break;
 		}
 	}
+	friend bool operator!=(const Song& left, const Song& right) //not changed
+	{
+		switch (Song::property)
+		{
+		case Property::artist:
+			return left.artist != right.artist;
+			break;
+		case Property::name:
+			return left.name != right.name;
+			break;
+		case Property::year:
+			return left.year != right.year;
+			break;
+		}
+	}
 	friend std::ostream& operator<<(std::ostream& out, Song& one)
 	{
 		out << one.name << " " << one.artist << " " << one.year << " ";// << std::endl;
@@ -146,12 +167,16 @@ Property Song::property = Property::name; //by default
 
 int main()
 {
-	Song s("How deep", "Anna Bana", 1998), s1("Po poleka", "Stefan Valdobrev", 2016), s2("Da", "Ina", 2011);
+	Song s("a", "ff", 5), s1("b", "gg", 2), s2("c", "hh", 2), s3("d", "zz", 2), s4("e", "gg", 1), s5("f", "ss", 6);
+	
 	//--name--
 	AVL<Song> name_sorted;
 	name_sorted.insert(s);
 	name_sorted.insert(s1);
 	name_sorted.insert(s2);
+	name_sorted.insert(s3);
+	name_sorted.insert(s4);
+	name_sorted.insert(s5);
 	name_sorted.inorder();
 	std::cout << std::endl;
 
@@ -159,16 +184,12 @@ int main()
 	Song::property = Property::year;
 
 	AVL<Song> year_sorted(name_sorted);
+	std::vector<Song> veco;
+	year_sorted.bigger_than_search(veco, 2);
 	year_sorted.inorder();
 	std::cout << std::endl;
 
-	//--artist--
-	Song::property = Property::artist;
-
-	AVL<Song> artist_sorted(name_sorted);
-	artist_sorted.inorder();
-	std::cout << std::endl;
-
-
-	return 0;
-}
+	for (auto i:veco)
+	{
+		std::cout << i << " ";
+	}
