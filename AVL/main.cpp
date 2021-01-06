@@ -26,11 +26,23 @@ public:
 		}
 		return *this;
 	}
-	//new overload for comparing a class member with a number by year
+	//new overload for >, < and ==
 	bool operator>(int right)
 	{
 		if (Song::property == Property::year)
 			return year > right;
+	}
+	bool operator>(int right)
+	{
+		if (Song::property == Property::year)
+			return year < right;
+	}
+	bool operator==(std::string str)
+	{
+		if (Song::property == Property::artist)
+			return artist == str;
+		if (Song::property == Property::name)
+			return name == str;
 	}
 
 	friend bool operator>(const Song& left, const Song& right) //without friend
@@ -167,7 +179,7 @@ Property Song::property = Property::name; //by default
 
 int main()
 {
-	Song s("a", "ff", 5), s1("b", "gg", 2), s2("c", "hh", 2), s3("d", "zz", 2), s4("e", "gg", 1), s5("f", "ss", 6);
+	Song s("a", "ff", 5), s1("b", "gg", 2), s2("a", "hh", 2), s3("d", "zz", 2), s4("e", "gg", 1), s5("f", "ss", 6);
 	
 	//--name--
 	AVL<Song> name_sorted;
@@ -185,11 +197,29 @@ int main()
 
 	AVL<Song> year_sorted(name_sorted);
 	std::vector<Song> veco;
-	year_sorted.bigger_than_search(veco, 2);
-	year_sorted.inorder();
-	std::cout << std::endl;
+	int a = 2;
+	year_sorted.bigger_than_search(veco, a);
+	year_sorted.inorder(); std::cout << std::endl;
 
-	for (auto i:veco)
+	for (auto i : veco)
 	{
 		std::cout << i << " ";
 	}
+	std::cout << std::endl;
+
+	//--artist--
+	Song::property = Property::artist;
+
+	AVL<Song> artist_sorted(name_sorted);
+	std::vector<Song> vecco;
+	std::string c = "gg";
+	year_sorted.equal_to_search(vecco, c);
+	artist_sorted.inorder(); std::cout << std::endl;
+	for (auto i : vecco)
+	{
+		std::cout << i << " ";
+	}
+	
+return 0;
+}
+	
