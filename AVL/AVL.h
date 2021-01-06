@@ -270,7 +270,7 @@ private:
 		return 1 + sizeHelp(root->left) + sizeHelp(root->right); //number of all nodes
 	}
 	//new function
-	std::vector<T>& inorder_search_help(Node* root, std::vector<T>& vec, int value)
+	std::vector<T>& inorder_bigger_help(Node* root, std::vector<T>& vec, int value)
 	{
 		if (root != nullptr)
 		{
@@ -278,6 +278,18 @@ private:
 			if (root->data > value)
 				vec.push_back(root->data);
 			inorder_search_help(root->right, vec, value);
+
+			return vec;
+		}
+	}
+	std::vector<T>& inorder_equal_help(Node* root, std::vector<T>& vec, std::string str)
+	{
+		if (root != nullptr)
+		{
+			inorder_equal_help(root->left, vec, str);
+			if (root->data == str)
+				vec.push_back(root->data);
+			inorder_equal_help(root->right, vec, str);
 
 			return vec;
 		}
@@ -320,7 +332,11 @@ public:
 	//new function
 	void bigger_than_search(std::vector<T>& vec, int value)
 	{
-		vec = inorder_search_help(root, vec, value);
+		vec = inorder_bigger_help(root, vec, value);
+	}
+	void equal_to_search(std::vector<T>& vec, std::string str)
+	{
+		vec = inorder_equal_help(root, vec, str);
 	}
 	
 	void inorder() const
