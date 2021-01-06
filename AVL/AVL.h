@@ -269,6 +269,19 @@ private:
 			return 0;
 		return 1 + sizeHelp(root->left) + sizeHelp(root->right); //number of all nodes
 	}
+	//new function
+	std::vector<T>& inorder_search_help(Node* root, std::vector<T>& vec, int value)
+	{
+		if (root != nullptr)
+		{
+			inorder_search_help(root->left, vec, value);
+			if (root->data > value)
+				vec.push_back(root->data);
+			inorder_search_help(root->right, vec, value);
+
+			return vec;
+		}
+	}
 
 public:
 	AVL() : root(nullptr) {}
@@ -304,14 +317,12 @@ public:
 	{
 		root = remove_help(root, element);
 	}
-
-	//other
-	/*void copy_insert()
+	//new function
+	void bigger_than_search(std::vector<T>& vec, int value)
 	{
-		AVL<T> other;
-		copy_insert_helper(other.root); //copying tree by insert()
-
-	}*/
+		vec = inorder_search_help(root, vec, value);
+	}
+	
 	void inorder() const
 	{
 		inorder_help(root);
