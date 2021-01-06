@@ -32,7 +32,7 @@ public:
 		if (Song::property == Property::year)
 			return year > right;
 	}
-	bool operator>(int right)
+	bool operator<(int right)
 	{
 		if (Song::property == Property::year)
 			return year < right;
@@ -45,7 +45,16 @@ public:
 			return name == str;
 	}
 
-	friend bool operator>(const Song& left, const Song& right) //without friend
+	friend bool operator>(const Song& left, const Song& right);
+	friend bool operator<(const Song& left, const Song& right);
+	friend bool operator==(const Song& left, const Song& right);
+	friend bool operator!=(const Song& left, const Song& right);
+	friend std::ostream& operator<<(std::ostream& out, Song& one);
+
+};
+
+Property Song::property = Property::name; //by default
+bool operator>(const Song& left, const Song& right) //without friend
 	{
 		//name,artist,year
 		switch (Song::property)
@@ -92,7 +101,7 @@ public:
 			break;
 		}
 	}
-	friend bool operator<(const Song& left, const Song& right)
+bool operator<(const Song& left, const Song& right)
 	{
 		switch (Song::property)
 		{
@@ -138,7 +147,7 @@ public:
 			break;
 		}
 	}
-	friend bool operator==(const Song& left, const Song& right) //not changed
+bool operator==(const Song& left, const Song& right) //not changed
 	{
 		switch (Song::property)
 		{
@@ -153,7 +162,7 @@ public:
 			break;
 		}
 	}
-	friend bool operator!=(const Song& left, const Song& right) //not changed
+bool operator!=(const Song& left, const Song& right) //not changed
 	{
 		switch (Song::property)
 		{
@@ -168,15 +177,11 @@ public:
 			break;
 		}
 	}
-	friend std::ostream& operator<<(std::ostream& out, Song& one)
+	std::ostream& operator<<(std::ostream& out, Song& one)
 	{
 		out << one.name << " " << one.artist << " " << one.year << " ";// << std::endl;
 		return out;
 	}
-
-};
-Property Song::property = Property::name; //by default
-
 int main()
 {
 	Song s("a", "ff", 5), s1("b", "gg", 2), s2("a", "hh", 2), s3("d", "zz", 2), s4("e", "gg", 1), s5("f", "ss", 6);
