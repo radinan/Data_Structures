@@ -2,7 +2,7 @@
 #include <sstream>
 #include <queue>
 
-class Expression
+class Expression //WHITE SPACES!!!!!
 {
 private:
     std::string input; //user's input
@@ -19,19 +19,17 @@ public:
             q_st.push(input);
         }
     }
-    void do_statements()
+    bool do_statements() //bool or node* or tree&
     {
         while (!q_st.empty()) //all elements
         {
-           // q_st.front().FUNC() -> return 0;
-           // q_st.front().FUNC() ->
+           //q_st.front().FUNC() -> return 0;
+           //else
             q_st.pop();
         }
-        //return 1;
+        return 1;
     }
-
 };
-
 class Statement
 {
 private:
@@ -49,15 +47,17 @@ public:
             q_co.push(st);
         }
     }
-    void do_commands()
+    bool do_commands() //bool node* or tree&
     {
         while (!q_co.empty()) //all elements
         {
-
+            //q_co.front().FUNC() == nullptr -> return 0
+            //else
+            q_co.pop();
         }
+        return 1;
     }
 };
-
 class Command
 {
 private:
@@ -68,12 +68,12 @@ private:
     enum Op {plus = '+', minus = '-', smaller = '<', bigger = '>', equals = '=', only = '!'}; //operator
     Op op;
     std::string opt; //option
-
 public:
     Command(std::string& _co) : co(_co){}
     void parse_command() //think about setters or making it private
     {
-        std::string one, two, three;
+        //perfect case with valid input
+        std::string one, two, three; //allowing further validation inside this func
         std::istringstream ss(co);
         ss >> one; 
         ss >> two;
@@ -128,9 +128,9 @@ public:
  
         opt = three;
     }
-    void do_command() //return 
+    void do_command() //return type???
     {
-        switch (type)
+        switch (type) //depending on the type and operator calling diff funcs
         {
         case Type::rating:
             switch (op)
@@ -167,17 +167,16 @@ public:
             }
         }
     }
-
 };
 
-/* bool isWhiteSpace(char c)
+/* bool is_white_space(char c)
  {
      return c <= 32;
  }
 
- void clearWhiteSpace()
+ void clear_white_space()
  {
-     while (isWhiteSpace(co.peek()))
+     while (is_white_space(co.peek()))
      {
          in.get();
      }
