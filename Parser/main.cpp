@@ -16,18 +16,21 @@ public:
 
         while (std::getline(ss, input, delimeter)) //reads and splits: statement || statement...
         {
-            q_st.push(input);
+            Statement st (input); //dynamic cast?
+            q_st.push(st);
         }
     }
-    bool do_statements() //bool or node* or tree&
+    AVL<Song>& do_expression() //bool or node* or tree&
     {
         while (!q_st.empty()) //all elements
         {
-           //q_st.front().FUNC() -> return 0;
-           //else
-            q_st.pop();
+            AVL<Song> pl_tree = q_st.front().do_statement(); //playlist tree
+            if (pl_tree.empty()) //if no tree for the criteria => empty
+                q_st.pop(); //check next statement
+            else
+                return pl_tree; //return the playlist
         }
-        return 1;
+        //return?
     }
 };
 class Statement
@@ -47,15 +50,18 @@ public:
             q_co.push(st);
         }
     }
-    bool do_commands() //bool node* or tree&
+    AVL<Song>& do_statement() //bool node* or tree&
     {
+        AVL<Song> original;//(lib.all_songs);
+
         while (!q_co.empty()) //all elements
         {
-            //q_co.front().FUNC() == nullptr -> return 0
-            //else
-            q_co.pop();
+            original = q_co.front().do_command(original); //change the playlist tree
+            if (original.empty()) //doesn't find matching songs
+                break;
+            q_co.pop(); //get next command
         }
-        return 1;
+        return original; //returns either empty or playlist tree
     }
 };
 class Command
@@ -79,6 +85,7 @@ public:
         ss >> two;
         ss.get(); //white space
         std::getline(ss, three);
+
         //think about switch case
         if (one == "rating")
         {
@@ -125,45 +132,60 @@ public:
         {
             //wrong
         }
- 
+        
+        //validation?
         opt = three;
     }
-    void do_command() //return type???
+    AVL<Song>& do_command(AVL<Song>& original) //return type???
     {
         switch (type) //depending on the type and operator calling diff funcs
         {
         case Type::rating:
             switch (op)
             {
-            case Op::bigger:
-                //AVLTree<Song> rating_bigger(main tree);
-                //rating_bigger.FUNC()
+            case Op::bigger: //rating > [opt]
+                Song::priority = Priority::rating;
+                AVL<Song> prior(original);
+                //prior.FUNC
+                return prior;
             }
         case Type::genre:
             switch (op)
             {
             case Op::plus:
-                //AVLTree<Song> add_genre(/*main tree);
-                //add_genre.FUNC()
+                Song::priority = Priority::genre;
+                AVL<Song> prior(original);
+                //prior.FUNC
+                return prior;
             case Op::minus:
-                //AVLTree<Song> remove_genre(/*main tree);
-                //add_genre.FUNC()
+                Song::priority = Priority::genre;
+                AVL<Song> prior(original);
+                //prior.FUNC
+                return prior;
             case Op::only:
-                //AVLTree<Song> fav_genre(/*main tree);
-                //add_genre.FUNC()
+                Song::priority = Priority::genre;
+                AVL<Song> prior(original);
+                //prior.FUNC
+                return prior;
             }
         case Type::year:
             switch (op)
             {
             case Op::equals:
-                //AVLTree<Song> equals_year(/*main tree);
-                //equals_year.FUNC()
+                Song::priority = Priority::year;
+                AVL<Song> prior(original);
+                //prior.FUNC
+                return prior;
             case Op::bigger:
-                //AVLTree<Song> bigger_year(/*main tree);
-                //bigger_year.FUNC()
+                Song::priority = Priority::year;
+                AVL<Song> prior(original);
+                //prior.FUNC
+                return prior;
             case Op::smaller:
-                //AVLTree<Song> smaller_year(/*main tree);
-                //smaller_year.FUNC()
+                Song::priority = Priority::year;
+                AVL<Song> prior(original);
+                //prior.FUNC
+                return prior;
             }
         }
     }
