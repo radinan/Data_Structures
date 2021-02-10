@@ -84,6 +84,95 @@ TEST_CASE("count")
     tr.insert(5, "LR");
     CHECK(tr.count() == 5);
 }
+TEST_CASE("countEvens")
+{
+    size_t countE = 0;
+    BinTree<int> tr;
+
+    countE = tr.countEvens();
+    CHECK(countE == 0);
+
+    tr.insert(1, "");
+    countE = tr.countEvens();
+    CHECK(countE == 0);
+
+    tr.insert(2, "L");
+    countE = tr.countEvens();
+    CHECK(countE == 1);
+
+    tr.insert(3, "R");
+    countE = tr.countEvens();
+    CHECK(countE == 1);
+
+    tr.insert(4, "LL");
+    countE = tr.countEvens();
+    CHECK(countE == 2);
+}
+TEST_CASE("searchCount")
+{
+    BinTree<int> tr;
+    int num = tr.searchCount([](const int& el) { return el % 2 == 0; });
+    CHECK(num == 0);
+    tr.insert(2, "");
+    num = tr.searchCount([](const int& el) { return el % 2 == 0; });
+    CHECK(num == 1);
+    tr.insert(1, "L");
+    tr.insert(6, "R");
+    num = tr.searchCount([](const int& el) { return el % 2 == 0; });
+    CHECK(num == 2);
+
+
+}
+TEST_CASE("height")
+{
+    BinTree<int> tr;
+    CHECK(tr.height() == -1);
+    tr.insert(1, "");
+    CHECK(tr.height() == 0);
+    tr.insert(2, "L");
+    tr.insert(3, "R");
+    CHECK(tr.height() == 1);
+    tr.insert(4, "LR");
+    CHECK(tr.height() == 2);
+}
+TEST_CASE("countLeaves")
+{
+    BinTree<int> tr;
+    CHECK(tr.countLeaves() == 0);
+    tr.insert(1, "");
+    CHECK(tr.countLeaves() == 1);
+    tr.insert(2, "L");
+    tr.insert(3, "R");
+    tr.insert(4, "LL");
+    tr.insert(5, "LR");
+    tr.insert(6, "RL");
+    tr.insert(7, "RR");
+    CHECK(tr.countLeaves() == 4);
+}
+TEST_CASE("maxLeaf")
+{
+    BinTree<int> tr;
+
+    tr.insert(1, "");
+    int leaf = tr.maxLeaf();
+    CHECK(leaf == 1);
+
+    tr.insert(2, "L");
+    leaf = tr.maxLeaf();
+    CHECK(leaf == 2);
+
+    tr.insert(3, "R");
+    leaf = tr.maxLeaf();
+    CHECK(leaf == 3);
+
+    tr.insert(4, "LL");
+    tr.insert(55, "LR");
+    tr.insert(6, "RL");
+    tr.insert(7, "RR");
+
+    leaf = tr.maxLeaf();
+    CHECK(leaf == 55);
+}
 
 int main()
 {
