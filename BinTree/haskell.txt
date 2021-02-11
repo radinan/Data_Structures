@@ -1,0 +1,5 @@
+Node 10 
+     Node 5 Empty Empty 
+     Node 20 
+          Node 15 Empty Empty 
+          Node 25 Empty Empty
