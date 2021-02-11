@@ -173,9 +173,158 @@ TEST_CASE("maxLeaf")
     leaf = tr.maxLeaf();
     CHECK(leaf == 55);
 }
+TEST_CASE("Scheme - serialize, parse; equal")
+{
+    BinTree<int> tr;
+    tr.insert(10, "");
+    tr.insert(5, "L");
+    tr.insert(20, "R");
+    tr.insert(15, "RL");
+    tr.insert(25, "RR");
 
+    std::ofstream out("Scheme.txt");
+    tr.serializeTreeScheme(out);
+    out.close();
+
+    BinTree<int> tr1;
+    std::ifstream in("Scheme.txt");
+    tr1.parseTreeScheme(in);
+    in.close();
+
+    CHECK(tr1[""] == 10);
+    CHECK(tr1["L"] == 5);
+    CHECK(tr1["R"] == 20);
+    CHECK(tr1["RL"] == 15);
+    CHECK(tr1["RR"] == 25);
+
+    bool equality = tr1 == tr;
+    CHECK(equality);
+
+    BinTree<int> tr2;
+    std::ofstream out1("Scheme2.txt");
+    tr2.serializeTreeScheme(out1);
+    out1.close();
+
+    BinTree<int> tr3;
+    std::ifstream in1("Scheme2.txt");
+    tr3.parseTreeScheme(in1);
+    in1.close();
+    equality = tr2 == tr3;
+    CHECK(equality);
+
+    equality = tr1 == tr3;
+    CHECK(!equality);
+}
+TEST_CASE("getNodeLevel")
+{
+    BinTree<int> e;
+    e.insert(10, "");
+    e.insert(5, "L");
+    e.insert(20, "R");
+    e.insert(15, "RL");
+    e.insert(25, "RR");
+    CHECK(e.getNodeLevel(10) == 0);
+    CHECK(e.getNodeLevel(5) == 1);
+    CHECK(e.getNodeLevel(20) == 1);
+    CHECK(e.getNodeLevel(15) == 2);
+    CHECK(e.getNodeLevel(25) == 2);
+
+}
+TEST_CASE("Haskell - serialize, parse; equal")
+{
+    BinTree<int> tr;
+    tr.insert(10, "");
+    tr.insert(5, "L");
+    tr.insert(20, "R");
+    tr.insert(15, "RL");
+    tr.insert(25, "RR");
+
+    std::ofstream out("haskell.txt");
+    tr.serializeTreeHaskell(out);
+    out.close();
+
+    BinTree<int> tr1;
+    std::ifstream in("haskell.txt");
+    tr1.parseTreeHaskell(in);
+    in.close();
+
+    CHECK(tr1[""] == 10);
+    CHECK(tr1["L"] == 5);
+    CHECK(tr1["R"] == 20);
+    CHECK(tr1["RL"] == 15);
+    CHECK(tr1["RR"] == 25);
+
+    bool equality = tr1 == tr;
+    CHECK(equality);
+
+    BinTree<int> tr2;
+    std::ofstream out1("haskell2.txt");
+    tr2.serializeTreeHaskell(out1);
+    out1.close();
+
+    BinTree<int> tr3;
+    std::ifstream in1("haskell2.txt");
+    tr3.parseTreeHaskell(in1);
+    in1.close();
+    equality = tr2 == tr3;
+    CHECK(equality);
+
+    equality = tr1 == tr3;
+    CHECK(!equality);
+}
+TEST_CASE("listLEaves")
+{
+    BinTree<int> tree;
+    tree.insert(10, "");
+    tree.insert(5, "L");
+    tree.insert(20, "R");
+    tree.insert(1, "LL");
+    tree.insert(2, "LR");
+    tree.insert(3, "RL");
+    tree.insert(4, "RR");    
+
+    
+    std::vector<int> vect = tree.listLeaves();
+    int counter = 1;
+    for (auto& i : vect)
+    {
+        CHECK(i == counter);
+        counter++;
+    }
+}
+TEST_CASE("findTrace")
+{
+    BinTree<int> t;
+    t.insert(10, "");
+    t.insert(5, "L");
+    t.insert(20, "R");
+    t.insert(15, "RL");
+    t.insert(25, "RR");
+    t.insert(7, "RRL");
+    t.insert(8, "RRR");
+
+    std::string trace = t.findTrace(7);
+    CHECK(trace == "RRL");
+
+    trace = t.findTrace(100);
+    CHECK(trace == "_");
+
+    trace = t.findTrace(5);
+    CHECK(trace == "L");
+
+    trace = t.findTrace(15);
+    CHECK(trace == "RL");
+}
 int main()
 {
+    /*BinTree<int> e;
+    e.insert(10, "");
+    e.insert(5, "L");
+    e.insert(20, "R");
+    e.insert(15, "RL");
+    e.insert(25, "RR");
+    e.serializeTreeHaskell(std::cout);
+    //std::cout << e.getNodeLevel(25);*/
     doctest::Context().run();
 }
 
