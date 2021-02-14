@@ -3,6 +3,7 @@
 #include "Graph.cpp"
 #include "doctest.h"
 #include <string>
+#include <vector>
 
 
 TEST_CASE("addVertex, addEdge, hasVertex, hasEdge, getWeight, neighbors")
@@ -47,8 +48,63 @@ TEST_CASE("addVertex, addEdge, hasVertex, hasEdge, getWeight, neighbors")
 
 }
 
+Graph<std::string, double> testGraph()
+{
+	Graph<std::string, double> airports;
+
+	airports.addVertex("Sofia");
+	airports.addVertex("New York");
+	airports.addVertex("Milan");
+	airports.addVertex("Naples");
+	airports.addVertex("Los Angelis");
+	airports.addVertex("Dan Francisko");
+	airports.addVertex("Boston");
+
+	airports.addEdge("Sofia", "Milan", 20);
+	airports.addEdge("Milan", "Sofia", 25);
+
+	airports.addEdge("Milan", "New York", 650);
+	airports.addEdge("New York", "Milan", 800);
+
+	airports.addEdge("Milan", "Naples", 100);
+	airports.addEdge("Naples", "Naples", 15);
+
+	airports.addEdge("New York", "Boston", 20);
+	airports.addEdge("New York", "Los Angelis", 200);
+	airports.addEdge("New York", "Dan Francisko", 120);
+	airports.addEdge("Dan Francisko", "Los Angelis", 60);
+
+	return airports;
+}
+
+template<class VertexType, class WeightType>
+bool isWay(const Graph<VertexType, WeightType>& g, const VertexType& v1, const VertexType& v2, std::vector<VertexType>& path)
+{
+	if (v1 == v2)
+		return true;
+
+	for (auto i : g.neighbors(v1))
+	{
+		if (std::find(path.begin(), path.end(), i.first) == path.end())
+		{
+			path.push_back(i.first);
+			if (isWay(g, i.first, v2, path))
+				return true;
+			path.pop_back();
+		}
+	}
+
+	return false;
+}
+void wayDFS()
+{
+
+}
+
 int main()
 {
+	std::vector<std::string> path;
+	std::cout << isWay<std::string, double>(testGraph(), "Sofia", "Naples", path) << std::endl;
 	doctest::Context().run();
 }
 
