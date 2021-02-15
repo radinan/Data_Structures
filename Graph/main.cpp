@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <queue>
+#include <set>
 
 
 TEST_CASE("addVertex, addEdge, hasVertex, hasEdge, getWeight, neighbors")
@@ -79,7 +80,7 @@ Graph<std::string, double> testGraph()
 }
 
 template<class VertexType, class WeightType>
-bool isWay(const Graph<VertexType, WeightType>& g, const VertexType& v1, const VertexType& v2, std::vector<VertexType>& path)
+bool isWayDFS(const Graph<VertexType, WeightType>& g, const VertexType& v1, const VertexType& v2, std::vector<VertexType>& path)
 {
 	path.push_back(v1);
 
@@ -97,7 +98,7 @@ bool isWay(const Graph<VertexType, WeightType>& g, const VertexType& v1, const V
 	{
 		if (std::find(path.begin(), path.end(), i.first) == path.end())
 		{
-			if (isWay(g, i.first, v2, path))
+			if (isWayDFS(g, i.first, v2, path))
 				return true;
 		}
 	}
@@ -163,16 +164,142 @@ void bestWayDFS(const Graph<VertexType, WeightType>& g, const VertexType& v1, co
 
 //--------------------------------------------------------------------------------------------------------------------------
 template <class VertexType, class WeightType>
-bool iswayBFS(const Graph<VertexType, WeightType>& g, const VertexType& v1, const VertexType& v2, std::vector <VertexType>& path)
+bool isWayBFS(const Graph<VertexType, WeightType>& g, const VertexType& v1, const VertexType& v2)
 {
+	std::queue<VertexType> q;
+	std::set<VertexType> visited;
+
+	q.push(v1);
+	visited.insert(v1); //?
+	while (!q.empty() && q.front() != v2)
+	{
+		VertexType curr = q.front(); q.pop();
+
+		for (auto i : g.neighbors(curr))
+		{
+			if (visited.count(i.first) == 0)
+			{
+				q.push(i.first);
+				visited.insert(i.first);
+			}
+		}
+	}
+
+	return !q.empty();
 }
+
+template <class VertexType, class WeightType>
+bool stepsWayBFS(const Graph<VertexType, WeightType>& g, const VertexType& v1, const VertexType& v2)
+{
+	std::queue<std::pair<VertexType, bool>> q;
+	std::set<VertexType> visited;
+	unsigned int lvl = 0;
+
+	q.push(std::make_pair(v1, true));
+	visited.insert(v1);
+	q.push(std::make_pair(VertexType(), false));
+
+	while (!q.empty() && q.front().first != v2)
+	{
+		std::pair<VertexType, bool> curr = q.front();
+		q.pop();
+
+		if (curr.second == false)
+		{
+			if (!q.empty())
+			{
+				++lvl;
+				q.push(std::make_pair(VertexType(), false));
+			}
+		}
+		else
+		{
+			std::cout << "lvl: " << lvl << " City: " << curr.first << std::endl;
+
+			for (auto i : g.neighbors(curr.first))
+			{
+				if (visited.count(i.first) == 0)
+				{
+					q.push(std::make_pair(i.first, true));
+					visited.insert(i.first);
+				}
+			}
+		}
+	}
+
+	return !q.empty();
+
+}
+
+template <class VertexType, class WeightType>
+void reverseBestWayBFS(const Graph<VertexType, WeightType>& g, const VertexType& v1, const VertexType& v2)
+{
+	std::queue<std::pair<VertexType, bool>> q;
+	std::set<VertexType> visited;
+	std::unordered_map<VertexType, VertexType> way;
+
+	q.push(std::make_pair(v1, true));
+	visited.insert(v1);
+	q.push(std::make_pair(VertexType(), false));
+
+	while (!q.empty() && q.front().first != v2)
+	{
+		std::pair<VertexType, bool> curr = q.front();
+		q.pop();
+
+		if (curr.second == false)
+		{
+			if (!q.empty())
+			{
+				q.push(std::make_pair(VertexType(), false));
+			}
+		}
+		else
+		{
+			for (auto i : g.neighbors(curr.first))
+			{
+				if (visited.count(i.first) == 0)
+				{
+					visited.insert(i.first);
+					q.push(std::make_pair(i.first, true));
+					way[i.first] = curr.first;
+
+				}
+			}
+		}
+	}
+
+	if (!q.empty())
+	{
+		VertexType curr = v2; 
+		std::cout << v2 ;
+		while (v1 != curr )
+		{
+			std::cout << ", " << way[curr];
+			curr = way[curr];
+		}
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 int main()
 {
 	std::vector<std::string> path, path1;
 	std::vector<std::vector<std::string>>allPaths;
-	//std::cout << isWay<std::string, double>(testGraph(), "Sofia", "Naples", path) << std::endl;
-	/*std::cout<< isWay<std::string, double>(testGraph(), "Sofia", "Los Angelis", path)<< std::endl;
+	//std::cout << isWayDFS<std::string, double>(testGraph(), "Sofia", "Naples", path) << std::endl;
+	/*std::cout<< isWayDFS<std::string, double>(testGraph(), "Sofia", "Los Angelis", path)<< std::endl;
 	for (auto i : path)
 	{
 		std::cout << i << " ";
@@ -180,12 +307,18 @@ int main()
 	std::cout << std::endl;*/
 
 	//allWaysDFS<std::string, double>(testGraph(), "New York", "Los Angelis", path, allPaths);
-	bestWayDFS<std::string, double>(testGraph(), "New York", "Los Angelis", path, path1);
+	/*bestWayDFS<std::string, double>(testGraph(), "New York", "Los Angelis", path, path1);
 	for (auto i : path1)
 	{
 		std::cout << i << " ";
 	}
-	std::cout << std::endl;
+	std::cout << std::endl;*/
+
+	//std::cout << isWayBFS<std::string, double>(testGraph(), "Sofia", "Los Angelis") << std::endl;
+	//std::cout << isWayBFS<std::string, double>(testGraph(), "Naples", "Sofia") << std::endl;
+
+	reverseBestWayBFS<std::string, double>(testGraph(), "New York", "Los Angelis");
+
 	doctest::Context().run();
 }
 
