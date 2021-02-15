@@ -4,6 +4,7 @@
 #include "doctest.h"
 #include <string>
 #include <vector>
+#include <queue>
 
 
 TEST_CASE("addVertex, addEdge, hasVertex, hasEdge, getWeight, neighbors")
@@ -80,31 +81,111 @@ Graph<std::string, double> testGraph()
 template<class VertexType, class WeightType>
 bool isWay(const Graph<VertexType, WeightType>& g, const VertexType& v1, const VertexType& v2, std::vector<VertexType>& path)
 {
+	path.push_back(v1);
+
 	if (v1 == v2)
+	{
+		/*for (auto it : path)
+		{
+			std::cout << it << " ";
+		}
+		std::cout << std::endl;*/
 		return true;
+	}
 
 	for (auto i : g.neighbors(v1))
 	{
 		if (std::find(path.begin(), path.end(), i.first) == path.end())
 		{
-			path.push_back(i.first);
 			if (isWay(g, i.first, v2, path))
 				return true;
-			path.pop_back();
 		}
 	}
 
+	//std::cout << "Current path: ";
+	//for (auto it : path)
+	//{
+	//	std::cout << it << " ";
+	//}
+	//std::cout << "Abandoning city: " << path.back() << std::endl;
+	path.pop_back();
 	return false;
 }
-void wayDFS()
-{
 
+template <class VertexType, class WeightType>
+void allWaysDFS(const Graph<VertexType, WeightType>& g, const VertexType& v1, const VertexType& v2,
+				std::vector<VertexType>& path, std::vector<std::vector<VertexType>>& allPaths)
+{
+	path.push_back(v1);
+
+	if (v1 == v2)
+	{
+		std::cout << "Path found: ";
+		for (std::string it : path)
+		{
+			std::cout << it << " ";
+		}
+		std::cout << std::endl;
+		allPaths.push_back(path);
+	}
+	else
+	{
+		for (auto i : g.neighbors(v1))
+		{
+			if (std::find(path.begin(), path.end(), i.first) == path.end())
+			{
+				allWaysDFS(g, i.first, v2, path, allPaths);
+			}
+		}
+	}
+	path.pop_back();
+}
+template <class VertexType, class WeightType>
+void bestWayDFS(const Graph<VertexType, WeightType>& g, const VertexType& v1, const VertexType& v2,
+				std::vector<VertexType>& path, std::vector<VertexType>& bestPath)
+{
+	path.push_back(v1);
+	if (v1 == v2)
+	{
+		if (bestPath.empty() || path.size() < bestPath.size()) //!!
+			bestPath = path;
+	}
+	else
+	{
+		for (auto n : g.neighbors(v1))
+		{
+			if (std::find(path.begin(), path.end(), n.first) == path.end())
+				bestWayDFS(g, n.first, v2, path, bestPath);
+		}
+	}
+	path.pop_back();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+template <class VertexType, class WeightType>
+bool iswayBFS(const Graph<VertexType, WeightType>& g, const VertexType& v1, const VertexType& v2, std::vector <VertexType>& path)
+{
 }
 
 int main()
 {
-	std::vector<std::string> path;
-	std::cout << isWay<std::string, double>(testGraph(), "Sofia", "Naples", path) << std::endl;
+	std::vector<std::string> path, path1;
+	std::vector<std::vector<std::string>>allPaths;
+	//std::cout << isWay<std::string, double>(testGraph(), "Sofia", "Naples", path) << std::endl;
+	/*std::cout<< isWay<std::string, double>(testGraph(), "Sofia", "Los Angelis", path)<< std::endl;
+	for (auto i : path)
+	{
+		std::cout << i << " ";
+	}
+	std::cout << std::endl;*/
+
+	//allWaysDFS<std::string, double>(testGraph(), "New York", "Los Angelis", path, allPaths);
+	bestWayDFS<std::string, double>(testGraph(), "New York", "Los Angelis", path, path1);
+	for (auto i : path1)
+	{
+		std::cout << i << " ";
+	}
+	std::cout << std::endl;
 	doctest::Context().run();
 }
 
