@@ -9,6 +9,40 @@
 #include <unordered_map>
 #include <map>
 
+//1 zad
+//nasochen, netegloven
+class Graph1
+{
+private:
+    //might change it
+    std::unordered_map<int, std::vector<std::pair<int, int>>> edges; //index, pairs of nodes
+    std::vector<int> verteces;
+    int N, K, M;
+public:
+    void addEdge(int v1, int v2, int index)
+    {
+        if (std::find(verteces.begin(), verteces.end(), v1) == verteces.end())
+            verteces.push_back(v1);
+        if (std::find(verteces.begin(), verteces.end(), v2) == verteces.end())
+            verteces.push_back(v2);
+
+        edges[index].push_back(std::make_pair(v1, v2));
+    }
+    void read()
+    {
+        std::cin >> N >> K >> M;
+        for (int i = 0; i < K; ++i)
+        {
+            int v1, v2;
+            std::cin >> v1 >> v2;
+            addEdge(v1, v2, i);
+        }
+    }
+
+    bool safepath(int v1, int v2, )
+};
+
+
 //2 zad
 class WordTree
 {
@@ -303,28 +337,30 @@ bool substitution(std::string& s1, std::string& s2)
 
 int main()
 {
-    WordTree tr;
-    tr.read(std::cin);
-    tr.print();
-    std::cout << std::endl;
-    tr.best_level();
-    //Node king 3 Node are 1 Node you 0 Node you 0 Node glad 2 Node are 0 Node king 0
+    //WordTree tr;
+    //tr.read(std::cin);
+    //tr.print();
+    //std::cout << std::endl;
+    //tr.best_level();
+    ////Node king 3 Node are 1 Node you 0 Node you 0 Node glad 2 Node are 0 Node king 0
 
-    std::cout << std::endl;
-    std::string t1 = "What an easy exam today, what an opportunity!", t2 = "What a difficult exam today, I give up!";
-    //std::getline(std::cin, t1);
-    //std::getline(std::cin, t2);
-    common_words(t1, t2);
+    //std::cout << std::endl;
+    //std::string t1 = "What an easy exam today, what an opportunity!", t2 = "What a difficult exam today, I give up!";
+    ////std::getline(std::cin, t1);
+    ////std::getline(std::cin, t2);
+    //common_words(t1, t2);
 
-    std::cout << std::endl;
-    std::string t = "In computing, a hash table (hash map) is a data structure that implements an associative array abstract data type, a structure that can map keys to values. A hash table uses a hash function to compute an index, also called a hash code, into an array of buckets or slots, from which the desired value can be found.";
-    max_pair_words(t);
+    //std::cout << std::endl;
+    //std::string t = "In computing, a hash table (hash map) is a data structure that implements an associative array abstract data type, a structure that can map keys to values. A hash table uses a hash function to compute an index, also called a hash code, into an array of buckets or slots, from which the desired value can be found.";
+    //max_pair_words(t);
 
-    std::string k1 = "The brown fox jumps over the brown dog",
-                k2 = "What an easy exam today, what an opportunity!",
-                k3 = "What a difficult exam today, I give up!";
-    std::cout << substitution(k1, k2);
+    //std::string k1 = "The brown fox jumps over the brown dog",
+    //            k2 = "What an easy exam today, what an opportunity!",
+    //            k3 = "What a difficult exam today, I give up!";
+    //std::cout << substitution(k1, k2);
 
+    Graph1 g1;
+    g1.read();
 
 }
 
